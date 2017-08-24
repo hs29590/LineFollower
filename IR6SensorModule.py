@@ -12,10 +12,14 @@ class IR6SensorModule():
             GPIO.setup(ir, GPIO.IN);
 
     def readSensor(self):
+        res = b'';
         for i in range(len(self.irsensors)):
             self.sensorReadings[i] = GPIO.input(self.irsensors[i]);
-
-        return self.sensorReadings;
+            if(self.sensorReadings[i] == 1):
+                res = res + '1';
+            else:
+                res = res + '0';
+        return res;
 
     def __del__(self):
         GPIO.cleanup();
