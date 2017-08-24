@@ -21,10 +21,12 @@ class LineFollowerRobot():
         self.error = 0;
         self.errorLast = 0;
         self.correction =0;
-        self.maxSpeed = 0.5; # 1
-        self.leftMotorSpeed = 0.3;
-        self.rightMotorSpeed = 0.3;
-        self.minSpeed = 0.1; 
+        self.maxSpeed = 255;
+        self.motorLSpeed = 100;
+        self.motorRSpeed = 100;
+        self.minSpeed = 30; 
+
+        self.f = open('log.txt','w');
     
     def scan(self):
         self.count = 0;
@@ -91,9 +93,92 @@ class LineFollowerRobot():
             self.error = self.errorLast;
 
     def updateCorrection(self):
-    
-        
+        if (self.error >= 0 and self.error < 30):
+            self.correction = 0;
+
+        elif(self.error >=30 and self.error < 60):
+            self.correction = 15;
+        elif(self.error >=60 and self.error < 90):
+            self.correction = 40;
+
+        elif(self.error >=90 and self.error < 120):
+            self.correction = 55;
+                
+        elif(self.error >=120 and self.error < 150):
+            self.correction = 75;
+
+        elif (self.error >=150 and self.error < 180):
+            self.correction = 255;
+
+        elif (self.error >=180):
+	    self.correction = 305;
+
+        if (self.error <= 0 and self.error > -30):
+            self.correction = 0;
+
+        elif (self.error <= -30 and self.error > -60):
+            self.correction = -15;
+
+   	elif (self.error <= -60 and self.error > -90):
+            self.correction = -40;
+
+	elif (self.error <= -90 and self.error > -120):
+            self.correction = -55;
+
+	elif (self.error <= -120 and self.error > -150):
+            self.correction = -75;
+
+	elif (self.error <= -150 and self.error > -180):
+            self.correction = -255;
+
+	elif (self.error <= -180):
+	    self.correction = -305;
+
+                      
+
+	if (self.correction >= 0): 
+
+	    self.motorRSpeed = self.maxSpeed - self.correction;
+            self.motorLSpeed = self.maxSpeed; 
+
+	elif (self.correction < 0):
+    	    self.motorRSpeed = self.maxSpeed;
+	    self.motorLSpeed = self.maxSpeed + self.correction;
+                             
+
     def drive(self):
+	self.motorRSpeed = self.motorRSpeed / 255.0;
+	self.motorLSpeed = self.motorLSpeed / 255.0;
+        
+
+	if(self.motorRSpeed < -0.5):
+		self.motorRSpeed = -0.5;
+	elif(self.motorRSpeed > 0.5):
+		self.motorRSpeed = 0.5;
+
+	if(self.motorLSpeed < -0.5):
+		self.motorLSpeed = -0.5;
+	elif(self.motorLSpeed > 0.5):
+		self.motorLSpeed = 0.5;
+
+        stri = self.sensorReadings + ', ' + str(self.error) + ', ' + str(self.correction) +  ', ' + str(self.motorRSpeed) +  ', ' + str(self.motorLSpeed);
+
+        self.f.write(stri);
+        self.f.write('\n');
+
+        if(self.motorRSpeed > 0):
+            self.car.motorRForward(self.motorRSpeed);
+        elif(self.motorRSpeed < 0):
+            self.car.motorRBackward(-self.motorRSpeed);
+        else:
+            self.car.motorRStop();
+        
+        if(self.motorLSpeed > 0):
+            self.car.motorLForward(self.motorLSpeed);
+        elif(self.motorLSpeed < 0):
+            self.car.motorLBackward(-self.motorLSpeed);
+        else:
+            self.car.motorLStop();
 
     def run(self):
         while(True):
@@ -101,43 +186,10 @@ class LineFollowerRobot():
             self.updateError();
             self.updateCorrection();
             self.drive();
-#
-#            sensorReadings = self.irsensor.readSensor();
-#            if(self.prevSensorReadings != sensorReadings):
-#                print sensorReadings
-#                self.prevSensorReadings = sensorReadings;
-#            if(sensorReadings == [0,0,0,0,0,0]):
-#                self.car.stop();
-#            #    print "stopping because, ", sensorReadings
-#            elif(sensorReadings == [0,0,1,1,1,1] or 
-#                    sensorReadings == [0, 0, 1, 0, 1, 1] or 
-#                    sensorReadings == [0, 0, 1, 0, 0, 1] #or 
-#             #       sensorReadings == [0, 0, 1, 0, 1, 0] #or
-##                    sensorReadings == [0, 0, 1, 1, 0, 1] or 
-##                    sensorReadings == [0, 0, 1, 1, 1, 0] or
-#                    ):
-#                print("\nHard Right Turn because\n");
-#                print sensorReadings
-#                self.hardRightTurn();
-#            elif(sensorReadings == [1,1,1,1,0,0] or 
-#                    sensorReadings == [1, 1, 1, 0, 0, 0] or
-#                    sensorReadings == [1, 0, 1, 0, 0, 0] #or 
-#          #          sensorReadings == [0, 1, 1, 0, 0, 0]# or
-##                    sensorReadings == [1, 0, 1, 1, 0, 0] or 
-##                    sensorReadings == [0, 1, 1, 1, 0, 0] or
-#                    ):
-#                print("\nHard Left Turn becase \n");
-#                print sensorReadings
-#                self.hardLeftTurn();
-#            elif(sensorReadings[2] == 1 or sensorReadings[3] == 1):
-#                self.car.forward();
-#            elif(sensorReadings[0] == 1 or sensorReadings[1] == 1):
-#                self.car.left();
-#            elif(sensorReadings[4] == 1 or sensorReadings[5] == 1):
-#                self.car.right();
 
     def __del__(self):
-        self.stopSensorReadingThread();
+        self.car.stop();
+        self.f.close();
 
 robot = LineFollowerRobot();
 robot.run();
