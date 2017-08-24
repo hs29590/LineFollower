@@ -19,10 +19,28 @@ class LeftRightMotorCar():
         self.motorLeft.forward(speed);
         self.motorRight.forward(speed);
 
-    def reverse(self,speed = 0.3):
+    def backward(self,speed = 0.3):
         self.motorLeft.backward(speed);
         self.motorRight.backward(speed);
-    
+   
+    def motorLForward(self,speed):
+        self.motorLeft.forward(speed);
+
+    def motorLBackward(self,speed):
+        self.motorLeft.backward(speed);
+
+    def motorRForward(self,speed):
+        self.motorRight.forward(speed);
+
+    def motorRBackward(self,speed):
+        self.motorRight.backward(speed);
+
+    def motorRStop(self):
+        self.motorRight.stop();
+
+    def motorLStop(self):
+        self.motorLeft.stop();
+
     def right(self,speed = 0.3):
         #left fwd
         self.motorLeft.forward(speed);
@@ -46,4 +64,7 @@ class LeftRightMotorCar():
         time.sleep(2);
         self.left();
         time.sleep(2);
+        self.stop();
+
+    def __del__(self):
         self.stop();
