@@ -1,2 +1,1 @@
-# LineFollower
-Line Follower Trial
+ROS with Line Follower, simple.
