@@ -38,28 +38,33 @@
 
 PKG = 'line_follower' # this package name
 import roslib; roslib.load_manifest(PKG)
+from LeftRightMotorCar import LeftRightMotorCar
+import time
 
 import rospy
 from std_msgs.msg import String
 
+class CommandReceiver():
+    def __init__(self):
+        leftMotorPos = 17;
+        leftMotorNeg = 4;
+        rightMotorPos = 3;
+        rightMotorNeg = 2;
 
-
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id()+"I heard %s",data.data)
+        self.car = LeftRightMotorCar(leftMotorPos,leftMotorNeg,rightMotorPos,rightMotorNeg);
     
-def listener():
+    def callback(self,data):
+        rospy.loginfo(rospy.get_caller_id()+"I heard %s",data.data)
 
-    # in ROS, nodes are unique named. If two nodes with the same
-    # node are launched, the previous one is kicked off. The 
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'talker' node so that multiple talkers can
-    # run simultaenously.
+        #command the motor to drive.
+
+if __name__ == '__main__':
+
+    cmdReceiver = CommandReceiver();
+        1
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("irsensor/readings", String, callback)
+    rospy.Subscriber("drive/command", String, cmdReceiver.callback)
+ 
+    rospy.spin();
 
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
-        
-if __name__ == '__main__':
-    listener()
