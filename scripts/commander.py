@@ -36,7 +36,7 @@
 ## Simple talker demo that listens to std_msgs/Strings published 
 ## to the 'chatter' topic
 
-PKG = 'rospy_tutorials' # this package name
+PKG = 'line_follower' # this package name
 import roslib; roslib.load_manifest(PKG)
 
 import rospy
@@ -54,7 +54,7 @@ def listener():
     # run simultaenously.
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("chatter", String, callback)
+    rospy.Subscriber("irsensor/readings", String, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
